@@ -1,0 +1,5 @@
+qwen3:1.7b
+gemma3:1b
+# optional smart lane (needs 8GB+ free RAM):
+# qwen3:8b
+# llama3.1:8b

@@ -1,0 +1,28 @@
+{
+  "usecases": [
+    {
+      "id": "robotics",
+      "label": "Robotics Ops",
+      "icon": "🤖",
+      "prompt_prefix": "You are operating a robotics lab (ROS, experiments, hardware checklists). Be concrete: commands, topics, safety checks. Task: "
+    },
+    {
+      "id": "agency",
+      "label": "AI Agency",
+      "icon": "💼",
+      "prompt_prefix": "You are delivering client AI work (lead intake, proposal, delivery checklist, handover). Be client-ready and specific. Task: "
+    },
+    {
+      "id": "founder",
+      "label": "Founder OS",
+      "icon": "⚡",
+      "prompt_prefix": "You are the founder's operator (GitHub, docs, WhatsApp, cron). Give commands and files to run today. Task: "
+    },
+    {
+      "id": "saas",
+      "label": "SaaS Product",
+      "icon": "☁️",
+      "prompt_prefix": "You are building multi-user SaaS (auth, profiles, limits, deploy). No billing needed; design local-first profiles. Task: "
+    }
+  ]
+}

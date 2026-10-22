@@ -1,0 +1,48 @@
+{
+  "global": {
+    "defaultDeadlineMs": 300000,
+    "graceAfterFirstSuccessMs": 6000,
+    "perLaneConcurrency": 1,
+    "circuitBreaker": {
+      "failureThreshold": 2,
+      "cooldownMs": 120000
+    }
+  },
+  "lanes": {
+    "opencode": {
+      "enabled": true,
+      "label": "OpenCode (Zen)",
+      "role": "Primary builder. Owns concrete execution: architecture, code, tooling, step-by-step technical plan, file and command specifics. Optimise for something the user can act on today.",
+      "command": "C:\\Users\\Admin\\AppData\\Roaming\\npm\\node_modules\\opencode-ai\\bin\\opencode.exe",
+      "argsPrefix": ["run"],
+      "model": "opencode/big-pickle",
+      "timeoutMs": 180000,
+      "env": {}
+    },
+    "hermes": {
+      "enabled": true,
+      "label": "Hermes Agent (local Ollama)",
+      "role": "Research and operations lane. Owns market and competitive context, constraints, risks, costs, tooling and open questions. Optimise for grounded specifics over breadth.",
+      "command": "C:\\Users\\Admin\\AppData\\Local\\Programs\\Python\\Python312\\Scripts\\hermes.exe",
+      "argsPrefix": ["-p", "aos", "-z"],
+      "hermesHome": "C:\\Users\\Admin\\AppData\\Local\\hermes",
+      "minContextLength": 8000,
+      "timeoutMs": 240000,
+      "env": {}
+    },
+    "openclaw": {
+      "enabled": true,
+      "label": "OpenClaw",
+      "role": "Automation and channels lane. Owns scheduling, comms, integrations, deployment and anything that needs a running service or an outbound channel.",
+      "command": "C:\\Program Files\\nodejs\\node.exe",
+      "argsPrefix": ["C:\\Users\\Admin\\AppData\\Roaming\\npm\\node_modules\\openclaw\\openclaw.mjs"],
+      "timeoutMs": 90000,
+      "requireGateway": true,
+      "env": {}
+    }
+  },
+  "synthesis": {
+    "mode": "fastest-wins",
+    "minLanesForMerge": 2
+  }
+}

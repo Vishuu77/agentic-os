@@ -1,0 +1,8 @@
+﻿node_modules/
+*.log
+*.err
+runs/*.jsonl
+runs/*.log
+runs/*.err
+.DS_Store
+.vscode/

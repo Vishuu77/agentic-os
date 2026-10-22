@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agentic OS</title>
+<style>
+  :root {
+    --bg: #0b0f14;
+    --panel: #121821;
+    --panel-2: #0e141c;
+    --line: #1e2833;
+    --text: #e6edf3;
+    --muted: #8b98a5;
+    --accent: #4f9cf9;
+    --ok: #3fb950;
+    --warn: #d29922;
+    --bad: #f85149;
+    --run: #58a6ff;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 14px/1.55 ui-sans-serif, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  header {
+    border-bottom: 1px solid var(--line);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--panel-2);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  header h1 { font-size: 15px; margin: 0; letter-spacing: .3px; }
+  header .sub { color: var(--muted); font-size: 12px; }
+  main {
+    display: grid;
+    grid-template-columns: minmax(320px, 420px) 1fr;
+    gap: 16px;
+    padding: 16px 20px 40px;
+    align-items: start;
+  }
+  @media (max-width: 900px) { main { grid-template-columns: 1fr; } }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 14px;
+  }
+  .card h2 {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .8px;
+    color: var(--muted);
+    margin: 0 0 10px;
+    font-weight: 600;
+  }
+  textarea {
+    width: 100%;
+    min-height: 132px;
+    resize: vertical;
+    background: var(--panel-2);
+    color: var(--text);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 10px;
+    font: inherit;
+  }
+  textarea:focus { outline: 1px solid var(--accent); border-color: var(--accent); }
+  .row { display: flex; gap: 10px; align-items: center; margin-top: 10px; flex-wrap: wrap; }
+  label.field { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted); }
+  input[type="number"], input[type="text"] {
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    color: var(--text);
+    border-radius: 6px;
+    padding: 6px 8px;
+    font: inherit;
+    width: 110px;
+  }
+  button {
+    background: var(--accent);
+    color: #04121f;
+    border: 0;
+    border-radius: 8px;
+    padding: 9px 16px;
+    font-weight: 650;
+    cursor: pointer;
+    font-size: 13px;
+  }
+  button:disabled { opacity: .5; cursor: not-allowed; }
+  button.ghost { background: transparent; color: var(--muted); border: 1px solid var(--line); }
+  .lane {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 9px 11px;
+    margin-bottom: 8px;
+    background: var(--panel-2);
+  }
+  .lane .top { display: flex; align-items: center; gap: 8px; }
+  .lane .name { font-weight: 600; font-size: 13px; }
+  .lane .role { color: var(--muted); font-size: 11.5px; margin-top: 3px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); flex: none; }
+  .dot.ready { background: var(--ok); }
+  .dot.down { background: var(--bad); }
+  .dot.running { background: var(--run); animation: pulse 1s infinite; }
+  .dot.ok { background: var(--ok); }
+  .dot.err { background: var(--warn); }
+  @keyframes pulse { 0%,100% { opacity: 1 } 50% { opacity: .25 } }
+  .pill {
+    margin-left: auto;
+    font-size: 11px;
+    color: var(--muted);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 1px 8px;
+    white-space: nowrap;
+  }
+  .pill.ok { color: var(--ok); border-color: #1d3b26; }
+  .pill.err { color: var(--warn); border-color: #3b3116; }
+  .pill.down { color: var(--bad); border-color: #3d1d1c; }
+  .out { min-height: 320px; }
+  .md h1 { font-size: 17px; margin: 0 0 4px; }
+  .md h2 { font-size: 14px; margin: 18px 0 8px; color: var(--accent); }
+  .md h3 { font-size: 13px; margin: 14px 0 6px; color: var(--text); }
+  .md p { margin: 8px 0; }
+  .md ul { margin: 8px 0; padding-left: 20px; }
+  .md li { margin: 3px 0; }
+  .md code { background: #1a222c; padding: 1px 5px; border-radius: 4px; font-size: 12.5px; }
+  .md em { color: var(--muted); }
+  .md strong { color: #fff; }
+  .meta { color: var(--muted); font-size: 12px; margin-bottom: 10px; }
+  .empty { color: var(--muted); font-style: italic; }
+  .presets { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+  .presets button {
+    background: var(--panel-2);
+    color: var(--muted);
+    border: 1px solid var(--line);
+    text-align: left;
+    font-weight: 400;
+    font-size: 12px;
+    padding: 7px 10px;
+  }
+  .presets button:hover { color: var(--text); border-color: var(--accent); }
+</style>
+</head>
+<body>
+<header>
+  <h1>Agentic OS</h1>
+  <span class="sub">master instruction → parallel lanes → fastest answer wins</span>
+</header>
+
+<main>
+  <div>
+    <div class="card">
+      <h2>Master instruction</h2>
+      <textarea id="request" placeholder="e.g. Help me plan the launch of my AI SaaS startup: what to build first, who to target, and what it costs."></textarea>
+
+      <div class="row">
+        <label class="field">Deadline (s)
+          <input type="number" id="deadline" value="240" min="15" step="15">
+        </label>
+        <button id="run">Run</button>
+        <button class="ghost" id="copy" disabled="">Copy</button>
+      </div>
+
+      <div class="presets">
+        <button data-p="Help me plan the launch of my AI SaaS startup: what to build first, who to target, and what it costs.">Startup launch plan</button>
+        <button data-p="Design the architecture for a local-first sync engine that works offline and syncs when connectivity returns.">Local-first sync architecture</button>
+        <button data-p="What are the biggest risks in charging for an AI product, and how should I price it in 2026?">AI product pricing risks</button>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <h2>Lanes</h2>
+      <div id="lanes"><div class="lane" data-lane="opencode">
+      <div class="top"><span class="dot ready"></span><span class="name">OpenCode (Zen)</span><span class="pill ok">ready</span></div>
+      <div class="role">Primary builder. Owns concrete execution: architecture, code, tooling, step-by-step technical plan, file and command specifics. Optimise for something the user can act on today.</div>
+    </div><div class="lane" data-lane="hermes">
+      <div class="top"><span class="dot ready"></span><span class="name">Hermes Agent (local Ollama)</span><span class="pill ok">ready</span></div>
+      <div class="role">Research and operations lane. Owns market and competitive context, constraints, risks, costs, tooling and open questions. Optimise for grounded specifics over breadth.</div>
+    </div><div class="lane" data-lane="openclaw">
+      <div class="top"><span class="dot err"></span><span class="name">OpenClaw</span><span class="pill down">unavailable</span></div>
+      <div class="role">gateway not listening on 127.0.0.1:18789 (start it with: openclaw gateway start)</div>
+    </div></div>
+    </div>
+  </div>
+
+  <div class="card out">
+    <h2>Deliverable</h2>
+    <div id="meta" class="meta"></div>
+    <div id="result" class="md empty">No run yet.</div>
+  </div>
+</main>
+
+<script>
+const $ = (id) => document.getElementById(id);
+let laneState = [];
+
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+function md(src) {
+  const lines = esc(src).split("\n");
+  let out = [], inList = false;
+  const inline = (t) => t
+    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+    .replace(/(^|[\s(])\*([^*\n]+)\*/g, "$1<em>$2</em>")
+    .replace(/`([^`]+)`/g, "<code>$1</code>");
+  const closeList = () => { if (inList) { out.push("</ul>"); inList = false; } };
+  for (const raw of lines) {
+    const line = raw.trimEnd();
+    let m;
+    if ((m = line.match(/^###\s+(.*)$/))) { closeList(); out.push(`<h3>${inline(m[1])}</h3>`); }
+    else if ((m = line.match(/^##\s+(.*)$/))) { closeList(); out.push(`<h2>${inline(m[1])}</h2>`); }
+    else if ((m = line.match(/^#\s+(.*)$/))) { closeList(); out.push(`<h1>${inline(m[1])}</h1>`); }
+    else if ((m = line.match(/^[-*]\s+(.*)$/))) {
+      if (!inList) { out.push("<ul>"); inList = true; }
+      out.push(`<li>${inline(m[1])}</li>`);
+    } else if (!line.trim()) { closeList(); }
+    else { closeList(); out.push(`<p>${inline(line)}</p>`); }
+  }
+  closeList();
+  return out.join("\n");
+}
+
+function dotClass(status, ready) {
+  if (status === "running") return "running";
+  if (status === "ok") return "ok";
+  if (status) return "err";
+  return ready ? "ready" : "down";
+}
+
+function renderLanes() {
+  const host = $("lanes");
+  if (!laneState.length) { host.innerHTML = '<div class="empty">no lanes</div>'; return; }
+  host.innerHTML = laneState.map((l) => {
+    const cls = dotClass(l.status, l.ready);
+    const pill = l.status
+      ? `<span class="pill ${l.status === "ok" ? "ok" : l.status === "unavailable" ? "down" : "err"}">${l.status}${l.ms ? " " + (l.ms / 1000).toFixed(1) + "s" : ""}</span>`
+      : `<span class="pill ${l.ready ? "ok" : "down"}">${l.ready ? "ready" : "unavailable"}</span>`;
+    return `<div class="lane" data-lane="${l.lane}">
+      <div class="top"><span class="dot ${cls}"></span><span class="name">${esc(l.label)}</span>${pill}</div>
+      <div class="role">${esc(l.reason ? l.reason : l.role || "")}</div>
+    </div>`;
+  }).join("");
+}
+
+async function loadDoctor() {
+  try {
+    const res = await fetch("/api/doctor");
+    const data = await res.json();
+    laneState = data.lanes.map((l) => ({ ...l, status: l.ready ? null : "unavailable" }));
+    renderLanes();
+  } catch (err) {
+    $("lanes").innerHTML = `<div class="empty">doctor failed: ${esc(err.message)}</div>`;
+  }
+}
+
+function setRunning(on) {
+  $("run").disabled = on;
+  $("run").textContent = on ? "Running..." : "Run";
+}
+
+async function run() {
+  const request = $("request").value.trim();
+  if (!request) return;
+  const deadline = Number($("deadline").value) * 1000;
+  laneState = laneState.map((l) => ({ ...l, status: l.ready ? "queued" : "unavailable", ms: null }));
+  renderLanes();
+  setRunning(true);
+  $("result").className = "md empty";
+  $("result").textContent = "Fanning out to lanes...";
+  $("meta").textContent = "";
+  $("copy").disabled = true;
+
+  const t0 = performance.now();
+  const timer = setInterval(() => {
+    $("meta").textContent = `running ${((performance.now() - t0) / 1000).toFixed(1)}s`;
+  }, 100);
+
+  try {
+    const res = await fetch("/api/run", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ request, deadline }),
+    });
+    const reader = res.body.getReader();
+    const dec = new TextDecoder();
+    let buf = "";
+    for (;;) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      buf += dec.decode(value, { stream: true });
+      let idx;
+      while ((idx = buf.indexOf("\n\n")) >= 0) {
+        const frame = buf.slice(0, idx);
+        buf = buf.slice(idx + 2);
+        let ev = "message", data = "";
+        for (const line of frame.split("\n")) {
+          if (line.startsWith("event:")) ev = line.slice(6).trim();
+          else if (line.startsWith("data:")) data += line.slice(5).trim();
+        }
+        if (!data) continue;
+        handle(ev, JSON.parse(data));
+      }
+    }
+  } catch (err) {
+    $("result").className = "md";
+    $("result").textContent = "Request failed: " + err.message;
+  } finally {
+    clearInterval(timer);
+    setRunning(false);
+  }
+}
+
+function handle(ev, payload) {
+  if (ev === "progress") {
+    if (payload.type === "lane.start") {
+      const l = laneState.find((x) => x.lane === payload.lane);
+      if (l) { l.status = "running"; renderLanes(); }
+    } else if (payload.type === "lane.result") {
+      const l = laneState.find((x) => x.lane === payload.lane);
+      if (l) { l.status = payload.status; l.ms = payload.durationMs; renderLanes(); }
+    } else if (payload.type === "first.success") {
+      const l = laneState.find((x) => x.lane === payload.lane);
+      if (l) { l.winner = true; renderLanes(); }
+    }
+  } else if (ev === "result") {
+    $("meta").textContent = `wall ${(payload.wallMs / 1000).toFixed(1)}s`
+      + ` · winner ${payload.winner || "none"}`
+      + ` · deadline ${(payload.deadlineMs / 1000).toFixed(0)}s`
+      + ` · ${payload.lanes.filter((l) => l.status === "ok").length}/${payload.lanes.length} lanes answered`;
+    if (payload.deliverable) {
+      $("result").className = "md";
+      $("result").innerHTML = md(payload.deliverable);
+      $("copy").disabled = false;
+      $("copy").dataset.text = payload.deliverable;
+    } else {
+      $("result").className = "md empty";
+      $("result").textContent = payload.headline || "No answer.";
+    }
+  } else if (ev === "failed") {
+    $("result").className = "md";
+    $("result").textContent = "Run failed: " + payload.error;
+  }
+}
+
+$("run").addEventListener("click", run);
+$("copy").addEventListener("click", async () => {
+  try {
+    await navigator.clipboard.writeText($("copy").dataset.text || "");
+    $("copy").textContent = "Copied";
+    setTimeout(() => { $("copy").textContent = "Copy"; }, 1200);
+  } catch { $("copy").textContent = "Copy failed"; }
+});
+document.querySelectorAll(".presets button").forEach((b) => {
+  b.addEventListener("click", () => { $("request").value = b.dataset.p; $("request").focus(); });
+});
+
+loadDoctor();
+</script>
+
+
+</body></html>

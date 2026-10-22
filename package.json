@@ -1,0 +1,17 @@
+{
+  "name": "agentic-os",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Master-instruction orchestrator fanning out to OpenCode, OpenClaw and Hermes Agent with fail-soft, fastest-answer-wins delivery.",
+  "main": "src/index.js",
+  "bin": {
+    "aos": "src/index.js"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "doctor": "node src/index.js doctor"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
